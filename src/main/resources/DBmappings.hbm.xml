@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.epam.employeesdb.model">
+	<class name="Country" table="countries">
+		<id name="id" column="country_id">
+			<generator class="increment" />
+		</id>
+		<property name="name" column="name" />
+	</class>
+
+	<class name="City" table="cities">
+		<id name="id" column="city_id">
+			<generator class="increment" />
+		</id>
+		<property name="name" column="name" />
+		<many-to-one name="country" column="country_id" class="Country"
+			cascade="save-update" not-null="true" />
+	</class>
+
+	<class name="Address" table="addresses">
+		<id name="id" column="address_id">
+			<generator class="increment" />
+		</id>
+		<property name="street" column="street" />
+		<property name="house" column="house" />
+		<property name="apartment" column="apartment" />
+		<many-to-one name="city" column="city_id" class="City"
+			cascade="save-update" not-null="true" />
+	</class>
+
+	<class name="Company" table="companies">
+		<id name="id" column="company_id">
+			<generator class="increment" />
+		</id>
+		<property name="name" column="name" />
+	</class>
+
+	<class name="Office" table="offices">
+		<id name="id" column="office_id">
+			<generator class="increment" />
+		</id>
+		<many-to-one name="company" column="company_id" class="Company"
+			cascade="save-update" not-null="true" />
+		<many-to-one name="address" column="address_id" class="Address"
+			cascade="save-update" unique="true" not-null="true" />
+	</class>
+
+	<class name="Position" table="positions">
+		<id name="id" column="position_id">
+			<generator class="increment" />
+		</id>
+		<property name="name" column="name" />
+	</class>
+
+	<class name="OfficePosition" table="offices_positions">
+		<id name="id" column="office_pos_id">
+			<generator class="increment" />
+		</id>
+		<many-to-one name="office" column="office_id" class="Office"
+			cascade="save-update" not-null="true" />
+		<many-to-one name="position" column="position_id" class="Position"
+			cascade="save-update" not-null="true" />
+	</class>
+
+	<class name="Employee" table="employees">
+		<id name="id" column="employee_id">
+			<generator class="increment" />
+		</id>
+		<property name="firstName" column="first_name" />
+		<property name="lastName" column="last_name" />
+		<many-to-one name="address" column="address_id" class="Address"
+			cascade="save-update" unique="true" not-null="true" />
+		<set name="officePositions" cascade="save-update" table="employees_office_pos">
+			<key column="employee_id" />
+			<many-to-many column="office_pos_id" class="OfficePosition" />
+		</set>
+	</class>
+
+
+
+
+
+
+
+	<!-- <class name="Country" table="countries"> <id name="id" column="country_id"> 
+		<generator class="increment"> </generator> </id> <property name="name" column="country_name" 
+		/> </class> <class name="City" table="cities"> <id name="id" column="city_id"> 
+		<generator class="increment"> </generator> </id> <many-to-one name="country" 
+		class="com.epam.employeesdb.model.Country" cascade="save-update"> <column 
+		name="country_id" not-null="true" /> </many-to-one> <property name="name" 
+		column="city_name" /> </class> <class name="Address" table="addresses"> <id 
+		name="id" column="address_id"> <generator class="increment"> </generator> 
+		</id> <many-to-one name="city" class="com.epam.employeesdb.model.City" cascade="save-update"> 
+		<column name="city_id" /> </many-to-one> <property name="street" column="street" 
+		/> <property name="house" column="house" /> <property name="apartment" column="apartment" 
+		/> </class> <class name="Company" table="companies"> <id name="id" column="company_id 
+		"> <generator class="increment"> </generator> </id> <property name="name" 
+		column="company_name" /> </class> <class name="Office" table="offices"> <id 
+		name="id" column="office_id "> <generator class="increment"> </generator> 
+		</id> <many-to-one name="company" class="com.epam.employeesdb.model.Company" 
+		cascade="save-update"> <column name="company_id" /> </many-to-one> <many-to-one 
+		name="address" class="com.epam.employeesdb.model.Address" cascade="save-update"> 
+		<column name="address_id" /> </many-to-one> </class> <class name="Employee" 
+		table="employees"> <id name="id" column="employee_id "> <generator class="increment"> 
+		</generator> </id> <property name="firstName" column="first_name" /> <property 
+		name="lastName" column="last_name" /> <many-to-one name="address" class="com.epam.employeesdb.model.Address" 
+		unique="true" cascade="save-update"> <column name="address_id" not-null="true" 
+		/> </many-to-one> </class> <class name="Position" table="positions"> <id 
+		name="id" column="position_id"> <generator class="increment"> </generator> 
+		</id> <property name="name" column="position_name" /> </class> -->
+
+	<!-- <column name="company_id" not-null="true" /> </key> <column name="address_id" 
+		not-null="true" /> </many-to-many><class name="Employee" table="employees"> 
+		<id name="id" column="employee_id "> <generator class="increment"> </generator> 
+		</id> <many-to-one name="address" class="com.epam.employeesdb.model.Address" 
+		unique="true" fetch="select"> <column name="address" not-null="true" /> </many-to-one> 
+		<set name="offices" table="employee_company" inverse="false" lazy="true" 
+		fetch="select" cascade="all"> <key> <column name="employee_id" not-null="true" 
+		/> </key> <many-to-many entity-name="com.epam.employeesdb.model.Office"> 
+		<column name="company_address_id" not-null="true" /> </many-to-many> </set> 
+		<property name="firstName" column="first_name" /> <property name="lastName" 
+		column="last_name" /> </class> <class name="Office" table="employee_company"> 
+		<id name="id" column="company_id "> <generator class="increment"> </generator> 
+		</id> <property name="company" column="company_id" /> <property name="office" 
+		column="office_id" /> </class> -->
+</hibernate-mapping>

@@ -1,0 +1,328 @@
+Create tables for entities with relations of entities as follows:
+
+COUNTRY 1 - * CITY
+CITY 1 - * ADDRESS
+COMPANY * - * EMPLOYEE
+COMPANY * - * ADDRESS
+EMPLOYEE 1 - 1 ADDRESS
+
+
+
+Create page employeeList.jsp with list of first 100 employees with employees information.
+Name(First Name + LastName), Address(String) of employee, Offices (company name, city, country, address, count of employees for given company office, position of given employee in office) where employee works. 
+Take into account possible performance problems and choose preferable optimization approaches to reduce quantity of queries (use JOIN and batch-size). Switch on the show-sql feature.
+
+Use Oracle database. Fill in every table with about 10000 records. Do not use the database VIEW. Use XML mappings approach.
+
+To know: what ORM is, DAO pattern
+
+-------------------------------------------------------------------
+
+	
+
+
+
+select employee, empAddress, empCity, empCountry, 
+officePos, off, company, offAddress, offCity, offCountry, pos
+from Employee as employee
+    join employee.address as empAddress
+    join empAddress.city as empCity
+    join empCity.country as empCountry
+    join employee.officePositions as officePos
+	join officePos.office as off
+	join off.company as company
+	join off.address as offAddress
+	join offAddress.city as offCity
+    join offCity.country as offCountry
+    join officePos.position as pos
+
+select c from City c join c.country
+
+
+
+
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------
+1.
+ 	
+ 	create table addresses(
+ 	address_id NUMBER PRIMARY KEY,
+ 	city_id 	   NUMBER ,
+ 	street     VARCHAR2(20),
+ 	house      NUMBER(5),
+ 	apartment  NUMBER(5),
+ 	FOREIGN KEY (city_id) REFERENCES cities(city_id)
+ 	);
+ 	____________________________________________________
+ 	DROP TABLE addresses;
+ 	
+ 	DROP SEQUENCE address_seq;
+ 	____________________________________________________
+ 	INSERT INTO addresses (city,street, house,apartment)
+   	VALUES (21,'Horror', 3, 33);
+    ____________________________________________________
+    SELECT * FROM addresses;
+    ____________________________________________________
+    create sequence address_seq;
+    
+    CREATE OR REPLACE TRIGGER addresses_tr
+	BEFORE INSERT ON addresses
+	FOR EACH ROW
+	BEGIN
+	  SELECT address_seq.NEXTVAL
+	  INTO   :new.address_id
+	  FROM   dual;
+	END;
+	/
+    
+    
+
+-------------------------------------------------------------------
+2. 	
+	create table cities(
+	city_id 	NUMBER PRIMARY KEY,
+	country_id		NUMBER NOT NULL,
+	city_name	VARCHAR2(20),
+	FOREIGN KEY (country_id) REFERENCES countries(country_id)
+	);
+	___________________________________________________
+	INSERT INTO cities (country,city_name)
+   	VALUES (24,'Fanipol');
+   	___________________________________________________
+   	SELECT * FROM cities; 
+   	___________________________________________________
+   	DROP TABLE cities;
+   	
+   	DROP SEQUENCE city_seq;
+   	___________________________________________________
+   	create sequence city_seq;
+   	
+   	CREATE OR REPLACE TRIGGER cities_tr
+	BEFORE INSERT ON cities
+	FOR EACH ROW
+	BEGIN
+	  SELECT city_seq.NEXTVAL
+	  INTO   :new.city_id
+	  FROM   dual;
+	END;
+	/
+   	---------------------------------------------------------------
+ 3.	
+ 	create table countries(
+	country_id 	NUMBER PRIMARY KEY,
+	country_name	VARCHAR2(20)
+	);
+	___________________________________________________
+	INSERT INTO countries (country_name)
+   	VALUES ('Switzerland');
+   	___________________________________________________
+   	SELECT * FROM countries; 
+   	___________________________________________________
+   	DROP TABLE countries;
+   	
+   	DROP SEQUENCE country_seq;
+   	___________________________________________________
+   	create sequence country_seq;
+   	
+   	CREATE OR REPLACE TRIGGER country_tr
+	BEFORE INSERT ON countries
+	FOR EACH ROW
+	BEGIN
+ 	SELECT country_seq.NEXTVAL
+  	INTO   :new.country_id
+  	FROM   dual;
+	END;
+	/
+   	---------------------------------------------------------------
+ 4.
+ 	create table employees(
+	employee_id 	NUMBER PRIMARY KEY,
+	first_name			VARCHAR2(20),
+	last_name		VARCHAR2(20),
+	address_id			NUMBER
+	FOREIGN KEY (address_id) REFERENCES addresses(address_id)
+	);
+	___________________________________________________
+	INSERT INTO employees (first_name,last_name,address)
+   	VALUES ('Peter','Parker',24);
+   	___________________________________________________
+   	SELECT * FROM employees; 
+   	___________________________________________________
+   	DROP TABLE employees;
+   	
+   	DROP SEQUENCE employee_seq;
+   	___________________________________________________
+   	create sequence employee_seq;
+   	
+   	CREATE OR REPLACE TRIGGER employees_tr
+	BEFORE INSERT ON employees
+	FOR EACH ROW
+	BEGIN
+ 	SELECT employee_seq.NEXTVAL
+  	INTO   :new.employee_id
+  	FROM   dual;
+	END;
+	/
+   	
+   	---------------------------------------------------------------
+ 5.
+ 	create table companies(
+ 	company_id 		NUMBER PRIMARY KEY,
+ 	company_name	VARCHAR2(30)
+ 	);
+ 	___________________________________________________
+ 	INSERT INTO companies (company_name)
+   	VALUES ('epam');
+   	___________________________________________________
+   	SELECT * FROM companies;
+   	___________________________________________________
+   	DROP TABLE companies;
+   	
+   	DROP SEQUENCE company_seq;
+   	___________________________________________________
+   	create sequence company_seq;
+   	
+   	CREATE OR REPLACE TRIGGER company_tr
+	BEFORE INSERT ON companies
+	FOR EACH ROW
+	BEGIN
+ 	SELECT company_seq.NEXTVAL
+  	INTO   :new.company_id
+  	FROM   dual;
+	END;
+	/
+   	
+   	
+ 	---------------------------------------------------------------
+ 6. 
+DROP TABLE employees_office_pos;
+DROP TABLE employees;
+DROP TABLE offices_positions;
+DROP TABLE offices;
+DROP TABLE addresses;
+DROP TABLE companies;
+DROP TABLE cities;
+DROP TABLE countries;
+DROP TABLE positions;
+ 	
+ 	constraint pk_company_address
+ 	PRIMARY KEY (company_id, address_id),
+ 	
+ 	create table offices(
+ 	office_id	    NUMBER PRIMARY KEY,
+ 	company_id		NUMBER,
+ 	address_id		NUMBER,
+ 	constraint fk_company
+ 	FOREIGN KEY (company_id) REFERENCES companies(company_id),
+ 	constraint fk_address
+ 	FOREIGN KEY (address_id) REFERENCES addresses(address_id)
+ 	);
+ 	___________________________________________________
+ 	SELECT * FROM company_address;
+   	___________________________________________________
+   	DROP TABLE company_address;
+   	
+   	DROP SEQUENCE company_address_seq;
+   	___________________________________________________
+   	create sequence company_address_seq;
+   	
+   	CREATE OR REPLACE TRIGGER company_address_tr
+	BEFORE INSERT ON company_address
+	FOR EACH ROW
+	BEGIN
+ 	SELECT company_address_seq.NEXTVAL
+  	INTO   :new.id
+  	FROM   dual;
+	END;
+	/
+	
+	drop trigger company_address_tr;
+ 	---------------------------------------------------------------
+ 	
+ 7.
+ 	create table employee_company(
+ 	employee_id			NUMBER,
+ 	company_id			NUMBER,
+ 	PRIMARY KEY (employee_id, company_id),
+ 	constraint fk_employee
+ 	FOREIGN KEY (employee_id) REFERENCES employees(employee_id),
+ 	constraint fk_company_employee
+ 	FOREIGN KEY (company_id) REFERENCES companies(company_id)
+ 	);
+ 	___________________________________________________
+ 	SELECT * FROM employee_company;
+   	___________________________________________________
+   	DROP TABLE employee_company;
+   	
+   	DROP SEQUENCE company_employee_seq;
+   	___________________________________________________
+   	create sequence company_employee_seq;
+   	
+   	CREATE OR REPLACE TRIGGER company_employee_tr
+	BEFORE INSERT ON company_employee
+	FOR EACH ROW
+	BEGIN
+ 	SELECT company_employee_seq.NEXTVAL
+  	INTO   :new.id
+  	FROM   dual;
+	END;
+	/
+ 	---------------------------------------------------------------
+ 8.
+ 	create table positions(
+ 	position_id		NUMBER PRIMARY KEY,
+ 	position_name			VARCHAR2(30)
+ 	);
+ 	___________________________________________________
+ 	SELECT * FROM positions;
+   	___________________________________________________
+   	DROP TABLE positions;
+   	___________________________________________________
+   	create sequence position_seq;
+   	
+   	CREATE OR REPLACE TRIGGER position_tr
+	BEFORE INSERT ON positions
+	FOR EACH ROW
+	BEGIN
+ 	SELECT position_seq.NEXTVAL
+  	INTO   :new.position_id
+  	FROM   dual;
+	END;
+	/
+ 	---------------------------------------------------------------
+ 9.
+ 	create table employees_details(
+ 	employee_id NUMBER,
+ 	company_id NUMBER,
+ 	address_id NUMBER,
+ 	position_id NUMBER
+ 	);
+ 
+  	---------------------------------------------------------------
+ 10.
+ 	create table office_employee_pos(
+ 	employee_id		NUMBER,
+ 	office_id 		NUMBER,
+ 	position_id		NUMBER,
+ 	PRIMARY KEY (employee_id, office_id, position_id),
+ 	constraint fk_employee
+ 	FOREIGN KEY (employee_id) REFERENCES employees(employee_id),
+ 	constraint fk_office
+ 	FOREIGN KEY (office_id) REFERENCES offices(office_id),
+ 	constraint fk_position
+ 	FOREIGN KEY (position_id) REFERENCES positions(position_id)
+ 	);
+ 	___________________________________________________
+ 	SELECT * FROM office_employee_pos;
+   	___________________________________________________
+   	DROP TABLE office_employee_pos;
+ 	---------------------------------------------------------------
+ 	
