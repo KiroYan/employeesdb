@@ -9,19 +9,8 @@
 <title>Employees</title>
 </head>
 <body>
-	<div id="container">
-		<div id="header">
-			<h2>
-				Employees
-			</h2>
-		</div>
-		<div id="content">
-			<c:forEach items="${employees}" var="employee">
-				<div>${employee.toString()}</div>
-				<br>
-			</c:forEach>
-		</div>
-	</div>
-
+	<jsp:forward page="/employees">
+		<jsp:param name="page" value="1" />
+	</jsp:forward>
 </body>
 </html>

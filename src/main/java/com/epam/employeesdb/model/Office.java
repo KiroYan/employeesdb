@@ -20,7 +20,6 @@ public class Office extends AbstractEntity {
 		this.address = address;
 	}
 
-	@Override
 	public String toString() {
 		return company + ", " + address + ", ";
 	}

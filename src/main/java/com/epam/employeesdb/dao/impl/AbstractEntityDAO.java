@@ -14,14 +14,16 @@ import com.epam.employeesdb.util.HibernateUtil;
 
 public abstract class AbstractEntityDAO<T extends Entity> implements
 		EntityDAO<T> {
-	private Class<?> entityClass;
+	private static final String  DELETE_QUERY = "delete from %s where id=:id";
+	private static final int BATCH_SIZE = 20; 
+	public static final String ID = "id";
 	private static SessionFactory sessionFactory;
-
+	private Class<?> entityClass;
+	
 	public AbstractEntityDAO(Class<?> entityClass) {
 		this.entityClass = entityClass;
 	}
 
-	@Override
 	public T get(Integer id) {
 		Session session = getConfiguredSessionFactory().openSession();
 		session.beginTransaction();
@@ -32,7 +34,6 @@ public abstract class AbstractEntityDAO<T extends Entity> implements
 		return entity;
 	}
 
-	@Override
 	public void create(T entity) {
 		Session session = getConfiguredSessionFactory().openSession();
 		try {
@@ -47,14 +48,13 @@ public abstract class AbstractEntityDAO<T extends Entity> implements
 		}
 	}
 
-	@Override
 	public void create(List<T> entityList) {
 		Session session = getConfiguredSessionFactory().openSession();
 		try {
 			session.beginTransaction();
 			for (int i = 0; i < entityList.size(); i++) {
 				session.save(entityList.get(i));
-				if (i % 20 == 0) {
+				if (i % BATCH_SIZE == 0) {
 					session.flush();
 			        session.clear();
 				}
@@ -69,15 +69,14 @@ public abstract class AbstractEntityDAO<T extends Entity> implements
 
 	}
 
-	@Override
 	public void delete(Integer id) {
 		Session session = getConfiguredSessionFactory().openSession();
-		String deleteQ = "delete from %s where id=:id";
+		String deleteQ = DELETE_QUERY;
 		Formatter f = new Formatter();
 		try {
 			session.beginTransaction();
 			Query q = session.createQuery(f.format(deleteQ, entityClass.getSimpleName()).toString());
-			q.setParameter("id", id);
+			q.setParameter(ID, id);
 			q.executeUpdate();
 			session.getTransaction().commit();
 		} catch (HibernateException e) {
@@ -89,7 +88,6 @@ public abstract class AbstractEntityDAO<T extends Entity> implements
 		}
 	}
 
-	@Override
 	public void update(T entity) {
 		Session session = getConfiguredSessionFactory().openSession();
 		try {

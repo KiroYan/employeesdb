@@ -37,33 +37,30 @@ public class EmployeeDAOImpl extends AbstractEntityDAO<Employee> implements Empl
 			+ "join fetch offCity.country as offCountry "
 			+ "join fetch officePos.position as pos";
 	
-	public static final String SELECT_COUNT_EMP_QUERY = "select count(distinct emp.id)" 
+	public static final String SELECT_COUNT_EMP_IN_OFFICE_QUERY = "select count(distinct emp.id)" 
 	+ "from Employee as emp "
 	+ "join  emp.officePositions as officePos "
 	+ "join  officePos.office as off "
 	+ "where off.id=:id";
 	
+	public static final String SELECT_COUNT_EMP_QUERY = "select count(distinct emp.id) from Employee as emp";
+	
+
 	public EmployeeDAOImpl() {
 		super(Employee.class);
 	}
 	
-	
-
-	@Override
 	public Employee get(Integer id) {
 		Session session = getConfiguredSessionFactory().openSession();
 		session.beginTransaction();
 		Query query = session.createQuery(EMP_BY_ID_QUERY);
-		query.setParameter("id", id);
+		query.setParameter(ID, id);
 		Employee employee = (Employee) query.list().get(0);
 		session.getTransaction().commit();
 		session.close();
 		return employee;
 	}
 
-
-
-	@Override
 	public List<Employee> getPaginated(int offset, int size) {
 		Session session = getConfiguredSessionFactory().openSession();
 		session.beginTransaction();
@@ -79,10 +76,19 @@ public class EmployeeDAOImpl extends AbstractEntityDAO<Employee> implements Empl
 	public int getNumberOfEmployeesInOffice(int officeId) {
 		Session session = getConfiguredSessionFactory().openSession();
 		session.beginTransaction();
-		Query query = session.createQuery(SELECT_COUNT_EMP_QUERY);
-		query.setParameter("id", officeId);
+		Query query = session.createQuery(SELECT_COUNT_EMP_IN_OFFICE_QUERY);
+		query.setParameter(ID, officeId);
 		int numberOfEmployeesInOffice = ((Long)query.uniqueResult()).intValue();
 		
 		return numberOfEmployeesInOffice;
+	}
+	
+	public int getNumberOfEmployees() {
+		Session session = getConfiguredSessionFactory().openSession();
+		session.beginTransaction();
+		Query query = session.createQuery(SELECT_COUNT_EMP_QUERY);
+		int numberOfEmployees = ((Long)query.uniqueResult()).intValue();
+		
+		return numberOfEmployees;
 	}
 }

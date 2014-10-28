@@ -19,8 +19,7 @@ To know: what ORM is, DAO pattern
 -------------------------------------------------------------------
 
 	
-
-
+--------------------------------------------------------------------
 
 select employee, empAddress, empCity, empCountry, 
 officePos, off, company, offAddress, offCity, offCountry, pos

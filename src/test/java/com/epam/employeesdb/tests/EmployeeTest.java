@@ -45,17 +45,36 @@ public class EmployeeTest {
 		int i = employeeDAO.getNumberOfEmployeesInOffice(officePositions.getOffice().getId());
 		System.out.println(i);
 	}
+	
+	//@Test 
+	public void fillDBWithEmployees() {
+		Random rn = new Random();
+		List<OfficePosition> officePositions = TestsUtils.createSomeOfficePositions();
+		for (int i = 0; i < 10000; i++) {
+			int j = i % 50;
+			Employee empl = TestsUtils.createSampleEmployee();
+			empl.getOfficePositions().clear();
+			empl.getOfficePositions().add(officePositions.get(rn.nextInt(50)));
+			empl.getOfficePositions().add(officePositions.get(rn.nextInt(50)));
+			employeeDAO.create(empl);
+		}
+	}
+	
+	//@Test
+	public void testCountAllEmployees() {
+		int numberOfEmployees = employeeDAO.getNumberOfEmployees();
+		
+		Assert.assertEquals(500, numberOfEmployees);
+	}
+	
+	@Test
+	public void get() {
+		employeeDAO.getPaginated(1, 2);
+		
+	}
 
 	
 	
-	/*Random rn = new Random();
-	
-	for (int i = 0; i < 10000; i++) {
-		int j = i % 50;
-		Employee empl = TestsUtils.createSampleEmployee();
-		empl.getOfficePositions().clear();
-		empl.getOfficePositions().add(officePositions.get(rn.nextInt(50)));
-		employeeDAO.create(empl);
-	} */
+	/* */
 	
 }

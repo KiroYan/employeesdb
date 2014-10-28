@@ -3,6 +3,7 @@ package com.epam.employeesdb.tests;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 
 import com.epam.employeesdb.model.Address;
 import com.epam.employeesdb.model.City;
@@ -14,17 +15,17 @@ import com.epam.employeesdb.model.OfficePosition;
 import com.epam.employeesdb.model.Position;
 
 public class TestsUtils {
-	private static int counter = 1;
+	private static Random rn = new Random();
 	public static Country createSampleCountry() {
 		Country country = new Country();
-		country.setName("Denmark" + (System.currentTimeMillis() % 100 ));
+		country.setName("Denmark" + (rn.nextInt(50000)));
 		
 		return country;
 	}
 	
 	public static City createSampleCity() {
 		City city = new City();
-		city.setName("New York" + (System.currentTimeMillis()% 100));
+		city.setName("New York" + (rn.nextInt(50000)));
 		city.setCountry(createSampleCountry());
 		
 		return city;
@@ -34,7 +35,7 @@ public class TestsUtils {
 		Address address = new Address();
 		address.setApartment(1);
 		address.setHouse(2);
-		address.setStreet("great street" + (System.currentTimeMillis()% 100));
+		address.setStreet("great street" + (rn.nextInt(50000)));
 		address.setCity(createSampleCity());
 		
 		return address;
@@ -42,15 +43,15 @@ public class TestsUtils {
 	
 	public static Company createSampleCompany() {
 		Company company = new Company(); 
-		company.setName("Apple" + (System.currentTimeMillis() % 1000));
+		company.setName("Apple" + (rn.nextInt(50000)));
 		
 		return company;
 	}
 	
 	public static Employee createSampleEmployee() {
 		Employee employee = new Employee();
-		employee.setFirstName("John" + (System.currentTimeMillis()% 100));
-		employee.setLastName("Show" + (System.currentTimeMillis()% 100));
+		employee.setFirstName("John" + (rn.nextInt(50000)));
+		employee.setLastName("Show" + (rn.nextInt(50000)));
 		employee.setAddress(createSampleAddress());
 		employee.setOfficePositions(new HashSet<OfficePosition>() {
 			{
@@ -65,7 +66,7 @@ public class TestsUtils {
 	
 	public static Position createSamplePosition() {
 		Position position = new Position();
-		position.setName("developer" +(System.currentTimeMillis()% 100));
+		position.setName("developer" +(rn.nextInt(50000)));
 		
 		return position;
 	}
@@ -86,12 +87,19 @@ public class TestsUtils {
 		return officePosition;
 	}
 	
-	public static List<OfficePosition> getSomeOfficePositions() {
+	public static List<OfficePosition> createSomeOfficePositions() {
 		List<OfficePosition> officePositions = new ArrayList<>();
+		Office office = createSampleOffice();
+		Position position = createSamplePosition();
 		for (int i = 0; i <= 50; i++) {
+			if (i % 2 == 0) {
+				office = createSampleOffice();
+				position = createSamplePosition();
+			}
+			
 			OfficePosition officePosition = new OfficePosition();
-			officePosition.setPosition(createSamplePosition());
-			officePosition.setOffice(createSampleOffice());
+			officePosition.setPosition(position);
+			officePosition.setOffice(office);
 			officePositions.add(officePosition);
 		}
 		

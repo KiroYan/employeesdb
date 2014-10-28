@@ -45,7 +45,6 @@ public class Employee extends AbstractEntity {
 		this.officePositions = officePositions;
 	}
 
-	@Override
 	public String toString() {
 		return firstName + ", " + lastName
 				+ ", " + address + ", "

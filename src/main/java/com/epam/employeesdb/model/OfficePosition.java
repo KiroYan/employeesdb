@@ -20,7 +20,6 @@ public class OfficePosition extends AbstractEntity {
 		this.position = position;
 	}
 
-	@Override
 	public String toString() {
 		return office + "," + position;
 	}

@@ -11,7 +11,6 @@ public class Company extends AbstractEntity {
 		this.name = name;
 	}
 
-	@Override
 	public String toString() {
 		return name;
 	}

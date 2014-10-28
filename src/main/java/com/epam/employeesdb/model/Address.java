@@ -49,9 +49,8 @@ public class Address extends AbstractEntity {
 		this.apartment = apartment;
 	}
 
-	@Override
 	public String toString() {
-		return city + "," + street + ","
+		return city + ", " + street + ", "
 				+ house + ", " + apartment;
 	}
 }
